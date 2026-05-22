@@ -57,5 +57,6 @@ def main() :
     get_racers_their_characteristics(racers)
     winner_index = race(racers)
     print(f"The winner is {COLORS[winner_index]} turtle")
+    time.sleep(5)
     
 main()
