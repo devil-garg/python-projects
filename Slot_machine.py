@@ -23,6 +23,7 @@ symbol_values = {
 
 def check_winnings(columns, lines, bet, values):
     winnings = 0
+    winning_in_lines = [ 0 for i in range(lines)]
     for row in range(lines) :
         symbol = columns[0][row]
         for column in columns :
@@ -30,9 +31,10 @@ def check_winnings(columns, lines, bet, values):
             if symbol != symbol_to_check :
                 break
         else :
-            winnings += values[symbol] * bet
+            winning_in_lines[row] = values[symbol] * bet
+            winnings += winning_in_lines[row]      
     
-    return winnings
+    return winning_in_lines,winnings
 
 def get_slot_machine_spin(rows, cols, symbols) :
     all_symbols = []
@@ -104,8 +106,7 @@ def get_bet() :
 
     return amount
 
-def main() :
-    balance = deposit()
+def spin(balance) :
     lines = get_number_of_lines()
 
     while True :
@@ -113,7 +114,14 @@ def main() :
         total_bet = bet * lines
 
         if total_bet > balance :
-            print(f"Insufficient balance! Your total bet exceeds your balance: ${balance} ")
+            print(f"Insufficient balance! Your total bet exceeds your balance")
+            choice = input("Do you want to deposit more? (y or n)").lower()
+            if choice == 'y' :
+                balance += deposit()
+            elif choice == 'n' :
+                print(f"Choose a bet that totals less than your current balance: {balance}")
+            else :
+                print("Provide a valid input")
         else :
             break
 
@@ -121,6 +129,23 @@ def main() :
 
     slots = get_slot_machine_spin(ROWS,COLS,symbol_count)
     print_slot_machine(slots)
-    print("You have won:",check_winnings(slots,lines,bet,symbol_values))
+
+    winning_in_lines,winnings = check_winnings(slots,lines,bet,symbol_values)
+    print(f"You have won {winning_in_lines} in corresponding lines")
+    print("Total Winnings:",winnings)
+
+    return winnings+balance-total_bet
+
+def main() :
+    balance = deposit()
+    balance = spin(balance)
+    while True : 
+        print("Your Current Balance:", balance)
+        choice = input("Do you want to quit or play more? (q)(p) ").lower()
+        if choice == 'q' :
+            print("Bye! Have a nice day!")
+            exit()
+        elif choice == "p" :
+            balance = spin(balance)
 
 main()
